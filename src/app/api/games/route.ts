@@ -32,3 +32,35 @@ export async function GET(request: Request) {
     );
   }
 }
+
+// POSTリクエスト（新規追加！）
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    // 簡単なバリデーション
+    if (!body.name || typeof body.price !== 'number') {
+      return NextResponse.json({ error: '必須項目が不足しています' }, { status: 400 });
+    }
+
+    const { data, error } = await supabase
+      .from('games')
+      .insert([
+        { 
+          name: body.name, 
+          description: body.description,
+          price: body.price,
+          image_url: body.image_url,
+          url: body.url // ゲームプレイ用のURL
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    return NextResponse.json(data[0]);
+  } catch (error) {
+    console.error('Error creating game:', error);
+    return NextResponse.json({ error: 'Failed to create game' }, { status: 500 });
+  }
+}
