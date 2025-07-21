@@ -3,6 +3,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link'; // 詳細ページへのリンクのためにインポート
 
 // ゲームデータの「型」を定義しておくと、TypeScriptが守ってくれます。
 type Game = {
@@ -50,18 +51,19 @@ const StorePage = () => {
       <h1 className="text-4xl font-bold mb-8">ゲームストア</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {games.map((game) => (
-          <div key={game.id} className="bg-gray-800 rounded-lg shadow-lg p-6 text-white">
+          // この key は一番外側の要素に付けます
+          <div key={game.id} className="bg-gray-800 rounded-lg shadow-lg p-6 text-white flex flex-col">
             <h2 className="text-2xl font-bold mb-2">{game.name}</h2>
-            {/* ここに将来的にゲームの画像などを表示 */}
-            <div className="h-40 bg-gray-700 rounded mb-4"></div>
-            <a 
-              href={game.url} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            {/* このdivは将来画像などに置き換わります。flex-growで可変の高さを埋めます */}
+            <div className="h-40 bg-gray-700 rounded mb-4 flex-grow"></div>
+            
+            {/* aタグをLinkコンポーネントに変更し、動的なURLを生成します */}
+            <Link 
+              href={`/game/${game.id}`}
+              className="mt-auto inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-center"
             >
-              プレイする
-            </a>
+              詳細を見る
+            </Link>
           </div>
         ))}
       </div>
