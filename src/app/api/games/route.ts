@@ -1,15 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// ★重要★
-// API Routeのようなサーバーサイドのコードでのみ、秘密キーを使います。
-// これにより、クライアントサイド（ブラウザ）に秘密キーが漏れるのを防ぎます。
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SECRET_KEY!
 );
 
-// 'GET'リクエストが来た時の処理
+// 'GET'リクエスト: 全てのゲームを取得
 export async function GET(request: Request) {
   try {
     // Supabaseの'games'テーブルから全てのデータを取得
@@ -33,7 +30,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POSTリクエスト（新規追加！）
+// 'POST'リクエスト: 新しいゲームを作成
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -50,15 +47,16 @@ export async function POST(request: Request) {
           name: body.name, 
           description: body.description,
           price: body.price,
-          image_url: body.image_url,
-          url: body.url // ゲームプレイ用のURL
+          url: body.url, // ゲームプレイ用のURL
+          media_urls: body.media_urls, // ★ image_urlから変更
         },
       ])
-      .select();
+      .select()
+      .single(); // 1件だけ返すのでsingle()を追加
 
     if (error) throw error;
 
-    return NextResponse.json(data[0]);
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error creating game:', error);
     return NextResponse.json({ error: 'Failed to create game' }, { status: 500 });
